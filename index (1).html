@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>League Table</title>
+<style>
+:root{--bg:#fff;--card:#fff;--tx:#1b0a1f;--mut:#6b5a70;--bd:#e5dce8;--ac:#37003c;--hi:#f3e8f6;--in:#f4eff6;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:16px 12px 40px}
+h1{font-size:22px;margin:4px 0 14px;padding:16px 14px;border-radius:14px;color:#fff;background:linear-gradient(135deg,#38003c,#7a1a8a);border-bottom:4px solid #00ff85;letter-spacing:.02em}
+h2{font-size:15px;margin:0 0 10px;color:var(--ac);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:14px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{font-size:12px;background:#37003c;color:#fff;font-weight:700;border-bottom:0}
+th:nth-last-child(2){color:#00ff85}
+td.t,th.t{text-align:left}
+td.t{font-weight:600;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+td.p{font-weight:800;color:var(--ac)}
+tr:first-child td{background:var(--hi)}
+tbody tr:last-child td{border-bottom:0}
+.pos{font-weight:700;border-left:5px solid transparent}
+tr.z1 .pos{border-left-color:#04f5ff}
+tr.z2 .pos{border-left-color:#ff8a00}
+tr.z3 .pos{border-left-color:#e90052}
+.fm b{display:inline-block;width:20px;height:20px;line-height:20px;border-radius:50%;font-size:11px;color:#fff;margin:0 1px}
+.fm .W{background:#00a85a}.fm .D{background:#9a8fa0}.fm .L{background:#e90052}
+.lg{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--mut)}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+input{font:inherit;color:var(--tx);background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:8px}
+.names input{width:100%}
+.fx{display:grid;grid-template-columns:1fr 46px 12px 46px 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:0}
+.fx span.h{text-align:right}
+.fx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx input{width:46px;text-align:center;padding:8px 2px}
+.fx .d{text-align:center;color:var(--mut)}
+.fx.pub{grid-template-columns:1fr 64px 1fr}
+.sc{text-align:center;font-weight:800;background:var(--hi);border-radius:8px;padding:6px 0;color:var(--ac)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;border:1px solid var(--bd);background:var(--in);color:var(--tx);border-radius:8px;padding:8px 12px}
+button.on{background:#37003c;color:#00ff85;border-color:#00ff85;font-weight:700}
+button:disabled{opacity:.5}
+.note{color:var(--mut);font-size:12px;margin-top:8px}
+.rh{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:center;margin:14px 0 4px;padding-bottom:6px;border-bottom:2px solid var(--ac)}
+.rh:first-child{margin-top:0}
+.by{font-size:12px;color:var(--mut);margin-left:8px;flex:1}
+.dt{font-size:12px;color:var(--mut)}
+.tm{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:12px;padding:0 0 6px;border-bottom:1px solid var(--bd)}
+.tm input{padding:4px 6px;font-size:13px}
+.adminonly{display:none}
+body.admin .adminonly{display:block}
+body.admin div.row.adminonly{display:flex}
+.adm{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#37003c;color:#fff;border-radius:12px;padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+.adm[hidden]{display:none}
+.adm .tx{flex:1;min-width:160px}
+.adm button.go{background:#00ff85;color:#37003c;border-color:#00ff85;font-weight:800}
+.login{display:grid;gap:8px;max-width:320px}
+.login[hidden]{display:none}
+.login input{width:100%}
+.err{color:#e90052;font-size:12px;min-height:16px}
+.foot{text-align:center;margin-top:8px}
+.foot button{background:none;border:0;color:var(--mut);font-size:12px;text-decoration:underline}
+body.admin .foot .li{display:none}
+</style>
+</head>
+<body>
+<main>
+<div class="adm" id="adm" hidden>
+  <span class="tx"><b>Admin mode.</b> Viewers see changes after you publish. <span id="msg"></span></span>
+  <button class="go" id="pub">Publish results</button>
+  <button id="out">Sign out</button>
+</div>
+
+<h1>League Table</h1>
+
+<div class="card">
+<h2>Standings</h2>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th class="t">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead>
+<tbody id="tbl"></tbody></table></div>
+<div class="lg"><span><i style="background:#04f5ff"></i>Champions League</span><span><i style="background:#ff8a00"></i>Europa League</span><span><i style="background:#e90052"></i>Relegation</span></div>
+<div class="note">Sorted by points, then goal difference, then goals scored.</div>
+</div>
+
+<div class="card">
+<h2>Results</h2>
+<div class="row adminonly" style="margin-bottom:8px">
+<button id="l1" class="on">Single round</button><button id="l2">Home and away</button>
+</div>
+<div id="fx"></div>
+<div class="note adminonly">Set the date for each matchday and a kick-off time per match, then type the scores. Leave scores blank if not played.</div>
+</div>
+
+<div class="card adminonly">
+<h2>Teams</h2>
+<div class="names" id="names"></div>
+<div class="row" style="margin-top:12px"><button id="rst">Clear all results</button></div>
+</div>
+
+<div class="card login" id="login" hidden>
+<h2>Admin sign in</h2>
+<input id="em" type="email" autocomplete="username" placeholder="Email">
+<input id="pw" type="password" autocomplete="current-password" placeholder="Password">
+<div class="row"><button class="on" id="si">Sign in</button><button id="sc">Cancel</button></div>
+<div class="err" id="err"></div>
+</div>
+
+<div class="foot"><button class="li" id="lo">Admin sign in</button></div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+/* ====== 1. PASTE YOUR FIREBASE WEB CONFIG HERE ====== */
+const firebaseConfig = {
+  apiKey: "AIzaSyC3RkVzUA47QkCosYEA8PZ5UpI029HzqbE",
+  authDomain: "league-7b3c4.firebaseapp.com",
+  projectId: "league-7b3c4",
+  storageBucket: "league-7b3c4.firebasestorage.app",
+  messagingSenderId: "536896512335",
+  appId: "1:536896512335:web:34692887fdd8c0abf4e53a"
+};
+/* ==================================================== */
+
+var app = initializeApp(firebaseConfig);
+var db = getFirestore(app);
+var auth = getAuth(app);
+var ref = doc(db, "league", "main");
+
+var DEFAULT = {names:["Team 1","Team 2","Team 3","Team 4","Team 5","Team 6","Team 7"],legs:1,res:{},dates:{},times:{}};
+var S = JSON.parse(JSON.stringify(DEFAULT));
+var admin = false, unsaved = false;
+var msg = document.getElementById("msg"), pub = document.getElementById("pub");
+
+function load(o){
+  if(!o || !o.names || o.names.length !== 7) return;
+  S = o; S.res = S.res || {}; S.dates = S.dates || {}; S.times = S.times || {}; S.legs = S.legs === 2 ? 2 : 1;
+}
+function nm(i){return (S.names[i]||"").trim()||("Team "+(i+1))}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function rounds(){var arr=[0,1,2,3,4,5,6,7],base=[],r,i,l,out=[];
+for(r=0;r<7;r++){var ms=[];for(i=0;i<4;i++){if(arr[i]!==7&&arr[7-i]!==7)ms.push([arr[i],arr[7-i]])}base.push(ms);arr=[arr[0],arr[7]].concat(arr.slice(1,7))}
+for(l=1;l<=S.legs;l++)base.forEach(function(ms){out.push(ms.map(function(p){var lo=Math.min(p[0],p[1]),hi=Math.max(p[0],p[1]);return l===1?{k:lo+"-"+hi+"-1",h:lo,a:hi}:{k:lo+"-"+hi+"-2",h:hi,a:lo}}))});
+return out}
+function fixtures(){return [].concat.apply([],rounds())}
+function played(k){var r=S.res[k];return r&&r[0]!==""&&r[1]!==""&&r[0]!=null&&r[1]!=null&&!isNaN(+r[0])&&!isNaN(+r[1])}
+function table(){
+var t=[],i;for(i=0;i<7;i++)t.push({i:i,p:0,w:0,d:0,l:0,gf:0,ga:0,f:[]});
+fixtures().forEach(function(m){if(!played(m.k))return;var r=S.res[m.k],h=+r[0],a=+r[1];
+var H=t[m.h],A=t[m.a];H.f.push(h>a?"W":h<a?"L":"D");A.f.push(a>h?"W":a<h?"L":"D");
+H.p++;A.p++;H.gf+=h;H.ga+=a;A.gf+=a;A.ga+=h;
+if(h>a){H.w++;A.l++}else if(a>h){A.w++;H.l++}else{H.d++;A.d++}});
+t.forEach(function(x){x.gd=x.gf-x.ga;x.pts=x.w*3+x.d});
+t.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||nm(a.i).localeCompare(nm(b.i))});
+return t}
+function drawTable(){
+document.getElementById("tbl").innerHTML=table().map(function(x,n){
+return "<tr class='"+(n<2?"z1":n===2?"z2":n>=5?"z3":"")+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+esc(nm(x.i))+"</td><td>"+x.p+"</td><td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td><td class='fm'>"+x.f.slice(-5).map(function(c){return "<b class='"+c+"'>"+c+"</b>"}).join("")+"</td></tr>"}).join("")}
+function fmtDate(v){if(!v)return "Date to be confirmed";try{return new Date(v+"T00:00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"})}catch(e){return v}}
+function drawFx(){
+document.getElementById("fx").innerHTML=rounds().map(function(ms,ri){
+var inr={};ms.forEach(function(m){inr[m.h]=1;inr[m.a]=1});var bye=-1;for(var q=0;q<7;q++)if(!inr[q])bye=q;
+var dv=S.dates[ri]||"";
+var head="<div class='rh'><b>Date "+(ri+1)+"</b><span class='by'>Rest: "+esc(nm(bye))+"</span>"+(admin?"<input type='date' data-d='"+ri+"' value='"+dv+"'>":"<span class='dt'>"+esc(fmtDate(dv))+"</span>")+"</div>";
+return head+ms.map(function(m){var r=S.res[m.k]||["",""];var tv=S.times[m.k]||"";
+if(admin)return "<div class='fx'><span class='h'>"+esc(nm(m.h))+"</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='0' value='"+r[0]+"'><span class='d'>-</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='1' value='"+r[1]+"'><span>"+esc(nm(m.a))+"</span></div><div class='tm'>Time <input type='time' data-t='"+m.k+"' value='"+tv+"'></div>";
+return "<div class='fx pub'><span class='h'>"+esc(nm(m.h))+"</span><span class='sc'>"+(played(m.k)?(+r[0])+" - "+(+r[1]):"vs")+"</span><span>"+esc(nm(m.a))+"</span></div>"+(tv?"<div class='tm'>Kick-off "+esc(tv)+"</div>":"<div class='tm' style='padding:0'></div>")}).join("")}).join("");
+}
+function drawLegs(){document.getElementById("l1").className=S.legs===1?"on":"";document.getElementById("l2").className=S.legs===2?"on":""}
+function drawNames(){
+document.getElementById("names").innerHTML=S.names.map(function(n,i){return "<input data-n='"+i+"' maxlength='24' value=\""+esc(n)+"\" aria-label='Team "+(i+1)+" name'>"}).join("");
+}
+function drawAll(){drawNames();drawLegs();drawFx();drawTable()}
+function dirty(){unsaved=true;msg.textContent="Unpublished changes."}
+
+document.getElementById("fx").addEventListener("input",function(e){
+if(!admin)return;
+var d=e.target.getAttribute("data-d");if(d!=null){S.dates[d]=e.target.value;dirty();return}
+var tt=e.target.getAttribute("data-t");if(tt!=null){S.times[tt]=e.target.value;dirty();return}
+var k=e.target.getAttribute("data-k");if(!k)return;
+var s=+e.target.getAttribute("data-s");var r=S.res[k]||["",""];r[s]=e.target.value;S.res[k]=r;dirty();drawTable()});
+document.getElementById("names").addEventListener("input",function(e){
+var n=e.target.getAttribute("data-n");if(n==null||!admin)return;
+S.names[+n]=e.target.value;dirty();drawTable();drawFx()});
+document.getElementById("l1").onclick=function(){S.legs=1;dirty();drawLegs();drawFx();drawTable()};
+document.getElementById("l2").onclick=function(){S.legs=2;dirty();drawLegs();drawFx();drawTable()};
+
+var rb=document.getElementById("rst"),armed=false,tm;
+rb.onclick=function(){
+if(!armed){armed=true;rb.textContent="Tap again to confirm";tm=setTimeout(function(){armed=false;rb.textContent="Clear all results"},3000);return}
+clearTimeout(tm);armed=false;rb.textContent="Clear all results";S.res={};dirty();drawFx();drawTable()};
+
+/* Publish: save to Firestore. Viewers update live. */
+pub.onclick = async function(){
+  pub.disabled = true; msg.textContent = "Publishing...";
+  try{
+    await setDoc(ref, {data: JSON.stringify(S), updatedAt: serverTimestamp()});
+    unsaved = false; msg.textContent = "Published.";
+  }catch(e){
+    msg.textContent = e && e.code === "permission-denied" ? "You do not have permission to publish." : "Could not publish. Check your connection and try again.";
+  }
+  pub.disabled = false;
+};
+
+/* Live updates for everyone. Admin's unpublished edits are never overwritten. */
+onSnapshot(ref, function(snap){
+  if(!snap.exists() || (admin && unsaved)) return;
+  try{ load(JSON.parse(snap.data().data)); drawAll(); }catch(e){}
+}, function(){});
+
+/* Admin sign in */
+var login = document.getElementById("login"), err = document.getElementById("err");
+document.getElementById("lo").onclick = function(){login.hidden = false; document.getElementById("em").focus()};
+document.getElementById("sc").onclick = function(){login.hidden = true; err.textContent = ""};
+document.getElementById("si").onclick = async function(){
+  err.textContent = "";
+  try{
+    await signInWithEmailAndPassword(auth, document.getElementById("em").value.trim(), document.getElementById("pw").value);
+    document.getElementById("pw").value = ""; login.hidden = true;
+  }catch(e){ err.textContent = "Wrong email or password." }
+};
+document.getElementById("out").onclick = function(){signOut(auth)};
+onAuthStateChanged(auth, function(user){
+  admin = !!user;
+  document.body.classList.toggle("admin", admin);
+  document.getElementById("adm").hidden = !admin;
+  if(!admin){unsaved = false; msg.textContent = ""}
+  drawAll();
+});
+
+drawAll();
+</script>
+</body>
+</html>
