@@ -114,6 +114,7 @@ body.admin .foot .li{display:none}
 .pv .ft{min-width:470px}
 .pv .ft td:first-child,.pv .ft th:first-child{position:sticky;left:0;background:#fff;z-index:1}
 .pv .ft td.t,.pv .ft th.t{position:sticky;left:34px;background:#fff;z-index:1;box-shadow:6px 0 6px -6px rgba(0,0,0,.15)}
+.pv .pb{display:inline-block;min-width:26px;height:26px;line-height:26px;padding:0 6px;border-radius:999px;background:#000;color:#fff;font-weight:800;font-size:13px;text-align:center}
 .pv .bk{display:inline-flex;align-items:center;gap:6px;color:#1a3d7c;text-decoration:none;font-size:14px;font-weight:500;margin:0 0 12px 2px}
 .pv .tm1{display:flex;align-items:center;gap:14px;margin:2px 2px 16px}
 .pv .tm1 b{display:block;font-size:24px;font-weight:500;line-height:1.2}
@@ -334,7 +335,7 @@ function vOverview(){
   if(next.length)out+="<div class='lab'>Coming up</div>"+cards(next);
   if(!done.length&&!next.length)out+=empty("No matches yet.");
   out+="<a class='more' href='#matches'>More matches <span>&#8250;</span></a>";
-  var rows=table().map(function(x,n){return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td></tr>"}).join("");
+  var rows=table().map(function(x,n){return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'><span class='pb'>"+x.pts+"</span></td></tr>"}).join("");
   out+="<div class='tc'><a class='tch' href='#table'><h2 class='sec' style='margin:0'>Table</h2><span>&#8250;</span></a>"
     +"<table><thead><tr><th>#</th><th class='t'>Team</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>"+rows+"</tbody></table>"+legend()+"</div>";
   return out;
@@ -353,7 +354,7 @@ function vMatches(){
 }
 function vTable(){
   var rows=table().map(function(x,n){
-    return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td><td class='fm'>"+chips(x.f.slice(-5))+"</td></tr>"}).join("");
+    return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'><span class='pb'>"+x.pts+"</span></td><td class='fm'>"+chips(x.f.slice(-5))+"</td></tr>"}).join("");
   return "<div class='scroll'><table class='ft'><thead><tr><th>#</th><th class='t'>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead><tbody>"+rows+"</tbody></table></div>"+legend()+"<div class='note'>Tap a team to see its results, fixtures and form.</div>";
 }
 function vTeam(i){
