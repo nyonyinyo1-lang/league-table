@@ -12,7 +12,7 @@
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 "Google Sans",Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
-main{max-width:600px;margin:0 auto;padding:8px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+main{max-width:600px;margin:0 auto;padding:8px 16px 48px}
 a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
 /* header and tabs */
@@ -136,47 +136,6 @@ body.admin div.row.adminonly{display:flex}
 .foot{text-align:center;margin-top:8px}
 .foot button{background:none;border:0;color:var(--mut);font-size:12px;text-decoration:underline}
 body.admin .foot .li{display:none}
-
-/* ---------- responsive ---------- */
-@media(max-width:380px){
-  main{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
-  .mc{grid-template-columns:1fr 88px;padding:12px 12px 12px 14px}
-  .hd h1,.hero h1{font-size:22px}
-  .hero .bd{width:50px;height:50px;font-size:16px}
-  .stats b{font-size:16px}
-  .chips a{padding:9px 13px}
-  .lt th,.lt td{padding:11px 6px}
-}
-@media(min-width:700px){
-  main{max-width:920px;padding-top:16px;padding-bottom:64px}
-  .hd{padding-top:24px}
-  .logo{width:min(300px,50%)}
-  .chips{justify-content:center}
-  .mg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .mg .mc{margin-bottom:0}
-  .tcols{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
-  .stats{grid-template-columns:repeat(8,1fr)}
-  .names{grid-template-columns:1fr 1fr;gap:8px 12px}
-  #fx{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;align-items:start}
-  .adm{margin-top:12px}
-}
-@media(min-width:1000px){
-  main{max-width:1160px}
-  .logo{width:340px}
-  .ov{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:start}
-  .ovt h2.sec{margin-top:4px}
-  .mg{grid-template-columns:repeat(3,1fr)}
-  .lt th,.lt td{padding:14px 12px}
-  .lt .tcol{padding-left:8px}
-  #fx{grid-template-columns:1fr 1fr 1fr}
-}
-@media(hover:hover){
-  .lt tr[data-team]:hover td{background:#eaedf1}
-  .chips a:hover{background:#e6e9ed}
-  .more:hover{filter:brightness(.96)}
-  .mc:hover{background:#f0f2f5}
-  button:hover:not(:disabled){filter:brightness(.97)}
-}
 </style>
 </head>
 <body>
@@ -330,10 +289,10 @@ function vOverview(){
   var L=fxList(),P=L.filter(isPl).reverse(),U=L.filter(isUp);
   var nr=Math.min(P.length,U.length?2:3),nn=Math.min(U.length,3-nr);
   var list=P.slice(0,nr).concat(U.slice(0,nn));
-  return "<div class='ov'><section class='ovc'><h2 class='sec' style='margin-top:4px'>Matches</h2>"+list.map(function(m){return card(m)}).join("")+
-    "<a class='more' href='#matches'>More matches "+CHEV+"</a></section>"+
-    "<section class='ovt'><h2 class='sec'>Table</h2><div class='box'>"+tblHTML(false)+"</div>"+legend()+
-    "<a class='more' href='#table'>Full table "+CHEV+"</a></section></div>";
+  return "<h2 class='sec' style='margin-top:4px'>Matches</h2>"+list.map(function(m){return card(m)}).join("")+
+    "<a class='more' href='#matches'>More matches "+CHEV+"</a>"+
+    "<h2 class='sec'>Table</h2><div class='box'>"+tblHTML(false)+"</div>"+legend()+
+    "<a class='more' href='#table'>Full table "+CHEV+"</a>";
 }
 
 function vMatches(){
@@ -346,7 +305,7 @@ function vMatches(){
     var ms=L.filter(function(m){return m.ri===ri&&(mf==="all"||(mf==="res"?isPl(m):isUp(m)))});
     if(!ms.length)return;
     var dv=S.dates[ri]||"",b=bye(rs[ri]);
-    out+="<div class='gh'><b>Matchday "+(ri+1)+"</b><span>"+esc(dv?fmtShort(dv):"Date TBC")+"</span></div>"+(b>=0?"<div class='rest'>Rest: "+esc(nm(b))+"</div>":"<div class='rest'></div>")+"<div class='mg'>"+ms.map(function(m){return card(m)}).join("")+"</div>";
+    out+="<div class='gh'><b>Matchday "+(ri+1)+"</b><span>"+esc(dv?fmtShort(dv):"Date TBC")+"</span></div>"+(b>=0?"<div class='rest'>Rest: "+esc(nm(b))+"</div>":"<div class='rest'></div>")+ms.map(function(m){return card(m)}).join("");
   });
   if(!out)out="<p class='empty'>"+(mf==="res"?"No results yet.":"No upcoming matches.")+"</p>";
   return h+out;
@@ -365,8 +324,8 @@ function vTeam(i){
     "<div class='stats'>"+stats.map(function(s){return "<div><b>"+s[1]+"</b><span>"+s[0]+"</span></div>"}).join("")+"</div>"+
     "<h2 class='sec'>Form</h2>"+
     (fp.length?"<div class='form'>"+fp.map(function(f){return "<div class='fc'><b class='"+f.c+"'>"+f.c+"</b><span>"+f.s+"</span><small>"+esc(abbr(nm(f.o)))+"</small></div>"}).join("")+"</div><div class='fnote'>Last "+fp.length+" matches, latest on the right. Score shows this team first.</div>":"<p class='empty'>No matches played yet.</p>")+
-    "<div class='tcols'><section><h2 class='sec'>Upcoming matches</h2>"+(U.length?U.map(function(m){return card(m,i)}).join(""):"<p class='empty'>No upcoming matches.</p>")+
-    "</section><section><h2 class='sec'>Results</h2>"+(P.length?P.slice().reverse().map(function(m){return card(m,i)}).join(""):"<p class='empty'>No results yet.</p>")+"</section></div>";
+    "<h2 class='sec'>Upcoming matches</h2>"+(U.length?U.map(function(m){return card(m,i)}).join(""):"<p class='empty'>No upcoming matches.</p>")+
+    "<h2 class='sec'>Results</h2>"+(P.length?P.slice().reverse().map(function(m){return card(m,i)}).join(""):"<p class='empty'>No results yet.</p>");
 }
 
 function renderView(){
@@ -401,8 +360,8 @@ if(!admin){el.innerHTML="";return}
 el.innerHTML=rounds().map(function(ms,ri){
 var dv=S.dates[ri]||"";
 var head="<div class='rh'><b>Matchday "+(ri+1)+"</b><span class='by'>Rest: "+esc(nm(bye(ms)))+"</span><input type='date' data-d='"+ri+"' value='"+dv+"'></div>";
-return "<div class='rd'>"+head+ms.map(function(m){var r=S.res[m.k]||["",""];var tv=S.times[m.k]||"";
-return "<div class='fx'><span class='h'>"+esc(nm(m.h))+"</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='0' value='"+r[0]+"'><span class='d'>-</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='1' value='"+r[1]+"'><span>"+esc(nm(m.a))+"</span></div><div class='tmin'>Time <input type='time' data-t='"+m.k+"' value='"+tv+"'></div>"}).join("")+"</div>"}).join("");
+return head+ms.map(function(m){var r=S.res[m.k]||["",""];var tv=S.times[m.k]||"";
+return "<div class='fx'><span class='h'>"+esc(nm(m.h))+"</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='0' value='"+r[0]+"'><span class='d'>-</span><input inputmode='numeric' type='number' min='0' data-k='"+m.k+"' data-s='1' value='"+r[1]+"'><span>"+esc(nm(m.a))+"</span></div><div class='tmin'>Time <input type='time' data-t='"+m.k+"' value='"+tv+"'></div>"}).join("")}).join("");
 }
 function drawLegs(){document.getElementById("l1").className=S.legs===1?"on":"";document.getElementById("l2").className=S.legs===2?"on":""}
 function drawNames(){
