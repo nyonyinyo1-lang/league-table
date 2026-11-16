@@ -101,9 +101,12 @@ table.lt{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 /* admin */
 .card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:14px;margin:18px 0}
 .card h2{font-size:16px;font-weight:500;margin:0 0 10px}
-.names{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.names{display:grid;grid-template-columns:1fr;gap:8px}
+.trow{display:flex;gap:8px;align-items:center}
+.trow input{flex:1;min-width:0}
+button.del{color:var(--L);border-color:#f0c4c0;background:#fff;flex:none}
+button.del.arm{background:var(--L);color:#fff;border-color:var(--L);font-weight:600}
 input{font:inherit;color:var(--tx);background:var(--in);border:1px solid var(--bd);border-radius:8px;padding:8px}
-.names input{width:100%}
 .fx{display:grid;grid-template-columns:1fr 46px 12px 46px 1fr;gap:6px;align-items:center;padding:6px 0}
 .fx span.h{text-align:right}
 .fx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -169,6 +172,8 @@ body.admin .foot .li{display:none}
 <div class="card adminonly">
 <h2>Teams</h2>
 <div class="names" id="names"></div>
+<div class="row" style="margin-top:12px"><input id="newt" maxlength="24" placeholder="New team name" aria-label="New team name" style="flex:1;min-width:140px"><button class="on" id="addt">Add team</button></div>
+<div class="note" id="tnote"></div>
 <div class="row" style="margin-top:12px"><button id="rst">Clear all results</button></div>
 </div>
 
@@ -204,7 +209,8 @@ var db = getFirestore(app);
 var auth = getAuth(app);
 var ref = doc(db, "league", "main");
 
-var DEFAULT = {names:["Team 1","Team 2","Team 3","Team 4","Team 5","Team 6","Team 7"],legs:1,res:{},dates:{},times:{}};
+var MAXT = 20, MINT = 2;
+var DEFAULT = {names:["Team 1","Team 2","Team 3","Team 4","Team 5","Team 6","Team 7"],ids:[0,1,2,3,4,5,6],nid:7,legs:1,res:{},dates:{},times:{}};
 var S = JSON.parse(JSON.stringify(DEFAULT));
 var admin = false, unsaved = false;
 var msg = document.getElementById("msg"), pub = document.getElementById("pub");
@@ -214,30 +220,35 @@ var CHEV = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-wi
 var BACK = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M15 5l-7 7 7 7'/></svg>";
 
 function load(o){
-  if(!o || !o.names || o.names.length !== 7) return;
+  if(!o || !Array.isArray(o.names) || o.names.length < MINT || o.names.length > MAXT) return;
+  /* older saves have no ids: team i simply gets id i, so existing result keys stay valid */
+  if(!Array.isArray(o.ids) || o.ids.length !== o.names.length) o.ids = o.names.map(function(_,i){return i});
+  var mx = Math.max.apply(null, o.ids);
+  o.nid = (typeof o.nid === "number" && o.nid > mx) ? o.nid : mx + 1;
   S = o; S.res = S.res || {}; S.dates = S.dates || {}; S.times = S.times || {}; S.legs = S.legs === 2 ? 2 : 1;
 }
-function nm(i){return (S.names[i]||"").trim()||("Team "+(i+1))}
+function nm(id){var x=S.ids.indexOf(id);return (x<0?"":(S.names[x]||"")).trim()||("Team "+(id+1))}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function abbr(n){var w=n.trim().split(/\s+/).filter(Boolean),s=w.length>1?w.map(function(x){return x.charAt(0)}).join(""):n.replace(/[^A-Za-z0-9]/g,"");return (s||"?").slice(0,3).toUpperCase()}
 function badge(i){return "<i class='bd' style='background:"+PAL[i%7]+"'>"+esc(abbr(nm(i)))+"</i>"}
 function ord(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
 
 /* ---------- fixtures and standings (unchanged logic) ---------- */
-function rounds(){var arr=[0,1,2,3,4,5,6,7],base=[],r,i,l,out=[];
-for(r=0;r<7;r++){var ms=[];for(i=0;i<4;i++){if(arr[i]!==7&&arr[7-i]!==7)ms.push([arr[i],arr[7-i]])}base.push(ms);arr=[arr[0],arr[7]].concat(arr.slice(1,7))}
+function rounds(){var arr=S.ids.slice(),base=[],r,i,l,out=[];
+if(arr.length%2)arr.push(-1);var m=arr.length;
+for(r=0;r<m-1;r++){var ms=[];for(i=0;i<m/2;i++){var x=arr[i],y=arr[m-1-i];if(x!==-1&&y!==-1)ms.push([x,y])}base.push(ms);arr=[arr[0],arr[m-1]].concat(arr.slice(1,m-1))}
 for(l=1;l<=S.legs;l++)base.forEach(function(ms){out.push(ms.map(function(p){var lo=Math.min(p[0],p[1]),hi=Math.max(p[0],p[1]);return l===1?{k:lo+"-"+hi+"-1",h:lo,a:hi}:{k:lo+"-"+hi+"-2",h:hi,a:lo}}))});
 return out}
 function fixtures(){return [].concat.apply([],rounds())}
 function fxList(){var out=[];rounds().forEach(function(ms,ri){ms.forEach(function(m){out.push({k:m.k,h:m.h,a:m.a,ri:ri})})});return out}
-function bye(ms){var inr={},q;ms.forEach(function(m){inr[m.h]=1;inr[m.a]=1});for(q=0;q<7;q++)if(!inr[q])return q;return -1}
+function bye(ms){var inr={},q;ms.forEach(function(m){inr[m.h]=1;inr[m.a]=1});for(q=0;q<S.ids.length;q++)if(!inr[S.ids[q]])return S.ids[q];return -1}
 function played(k){var r=S.res[k];return r&&r[0]!==""&&r[1]!==""&&r[0]!=null&&r[1]!=null&&!isNaN(+r[0])&&!isNaN(+r[1])}
 function isPl(m){return played(m.k)}
 function isUp(m){return !played(m.k)}
 function table(){
-var t=[],i;for(i=0;i<7;i++)t.push({i:i,p:0,w:0,d:0,l:0,gf:0,ga:0,f:[]});
+var t=[],M={};S.ids.forEach(function(id){var o={i:id,p:0,w:0,d:0,l:0,gf:0,ga:0,f:[]};t.push(o);M[id]=o});
 fixtures().forEach(function(m){if(!played(m.k))return;var r=S.res[m.k],h=+r[0],a=+r[1];
-var H=t[m.h],A=t[m.a];H.f.push(h>a?"W":h<a?"L":"D");A.f.push(a>h?"W":a<h?"L":"D");
+var H=M[m.h],A=M[m.a];H.f.push(h>a?"W":h<a?"L":"D");A.f.push(a>h?"W":a<h?"L":"D");
 H.p++;A.p++;H.gf+=h;H.ga+=a;A.gf+=a;A.ga+=h;
 if(h>a){H.w++;A.l++}else if(a>h){A.w++;H.l++}else{H.d++;A.d++}});
 t.forEach(function(x){x.gd=x.gf-x.ga;x.pts=x.w*3+x.d});
@@ -249,7 +260,7 @@ function curMd(){var rs=rounds(),i,j;for(i=0;i<rs.length;i++)for(j=0;j<rs[i].len
 function fmtDate(v){if(!v)return "Date to be confirmed";try{return new Date(v+"T00:00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"})}catch(e){return v}}
 function fmtShort(v){if(!v)return "";try{return new Date(v+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return v}}
 function formHTML(a){return a.map(function(c){return "<b class='"+c+"'>"+c+"</b>"}).join("")}
-function legend(){return "<div class='lg'><span><i style='background:#1a73e8'></i>Champions League</span><span><i style='background:#e8710a'></i>Europa League</span><span><i style='background:#d93025'></i>Relegation</span></div>"}
+function legend(){if(S.ids.length<6)return "";return "<div class='lg'><span><i style='background:#1a73e8'></i>Champions League</span><span><i style='background:#e8710a'></i>Europa League</span><span><i style='background:#d93025'></i>Relegation</span></div>"}
 
 function card(m,f){
   var pl=played(m.k),r=S.res[m.k]||["",""],h=+r[0],a=+r[1],tv=S.times[m.k]||"",dv=fmtShort(S.dates[m.ri]||"");
@@ -267,7 +278,7 @@ function card(m,f){
 function tblHTML(full){
   var T=table(),h="<div class='tw'><table class='lt'><thead><tr><th class='pos'>#</th><th class='tcol'>Team</th><th>P</th>"+(full?"<th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th>":"")+"<th>GD</th><th>Pts</th>"+(full?"<th>Form</th>":"")+"</tr></thead><tbody>";
   T.forEach(function(x,n){
-    var z=n<2?"z1":n===2?"z2":n>=5?"z3":"";
+    var NT=T.length,z=NT<6?"":n<2?"z1":n===2?"z2":n>=NT-2?"z3":"";
     h+="<tr class='"+z+"' data-team='"+x.i+"'><td class='pos'>"+(n+1)+"</td><td class='tcol'><a href='#team-"+x.i+"'>"+badge(x.i)+"<span>"+esc(nm(x.i))+"</span></a></td><td>"+x.p+"</td>"+(full?"<td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td>":"")+"<td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td>"+(full?"<td class='fm'>"+formHTML(x.f.slice(-5))+"</td>":"")+"</tr>";
   });
   return h+"</tbody></table></div>";
@@ -309,7 +320,7 @@ function vTeam(i){
   var fp=P.slice(-5).map(function(m){var r=S.res[m.k],h=+r[0],a=+r[1],home=m.h===i,own=home?h:a,opp=home?a:h;return {c:own>opp?"W":own<opp?"L":"D",s:own+"-"+opp,o:home?m.a:m.h}});
   var stats=[["P",x.p],["W",x.w],["D",x.d],["L",x.l],["GF",x.gf],["GA",x.ga],["GD",(x.gd>0?"+":"")+x.gd],["Pts",x.pts]];
   return "<button class='back' data-back='1'>"+BACK+"Back</button>"+
-    "<div class='hero'>"+badge(i)+"<div><h1>"+esc(nm(i))+"</h1><div class='sub'>"+ord(pos)+" of 7 teams</div></div></div>"+
+    "<div class='hero'>"+badge(i)+"<div><h1>"+esc(nm(i))+"</h1><div class='sub'>"+ord(pos)+" of "+S.ids.length+" teams</div></div></div>"+
     "<div class='stats'>"+stats.map(function(s){return "<div><b>"+s[1]+"</b><span>"+s[0]+"</span></div>"}).join("")+"</div>"+
     "<h2 class='sec'>Form</h2>"+
     (fp.length?"<div class='form'>"+fp.map(function(f){return "<div class='fc'><b class='"+f.c+"'>"+f.c+"</b><span>"+f.s+"</span><small>"+esc(abbr(nm(f.o)))+"</small></div>"}).join("")+"</div><div class='fnote'>Last "+fp.length+" matches, latest on the right. Score shows this team first.</div>":"<p class='empty'>No matches played yet.</p>")+
@@ -319,6 +330,7 @@ function vTeam(i){
 
 function renderView(){
   var isT=cur.v==="team",v=document.getElementById("view");
+  if(isT&&S.ids.indexOf(cur.i)<0){cur={v:"table"};isT=false;if(location.hash!=="#table")history.replaceState(null,"","#table")}
   document.getElementById("hd").hidden=isT;
   document.getElementById("chips").hidden=isT;
   document.getElementById("sub").textContent="Matchday "+curMd()+" of "+rounds().length;
@@ -330,7 +342,7 @@ function renderView(){
 
 /* ---------- routing: #overview  #matches  #table  #team-0 ... ---------- */
 function route(){
-  var h=location.hash.replace("#",""),m=/^team-([0-6])$/.exec(h);
+  var h=location.hash.replace("#",""),m=/^team-(\d+)$/.exec(h);
   cur=m?{v:"team",i:+m[1]}:{v:(h==="matches"||h==="table")?h:"overview"};
   renderView();window.scrollTo(0,0);
 }
@@ -353,7 +365,10 @@ return "<div class='fx'><span class='h'>"+esc(nm(m.h))+"</span><input inputmode=
 }
 function drawLegs(){document.getElementById("l1").className=S.legs===1?"on":"";document.getElementById("l2").className=S.legs===2?"on":""}
 function drawNames(){
-document.getElementById("names").innerHTML=S.names.map(function(n,i){return "<input data-n='"+i+"' maxlength='24' value=\""+esc(n)+"\" aria-label='Team "+(i+1)+" name'>"}).join("");
+var N=S.ids.length;
+document.getElementById("names").innerHTML=S.names.map(function(n,i){return "<div class='trow'><input data-n='"+i+"' maxlength='24' value=\""+esc(n)+"\" aria-label='Team "+(i+1)+" name'><button class='del' data-del='"+S.ids[i]+"' aria-label='Delete "+esc(n)+"'"+(N<=MINT?" disabled":"")+">Delete</button></div>"}).join("");
+document.getElementById("addt").disabled=N>=MAXT;
+document.getElementById("tnote").textContent=N+" of "+MAXT+" teams. Adding or removing a team rebuilds the fixtures. Results between the remaining teams are kept, a deleted team's results are removed, and matchday dates may need checking."+(N<=MINT?" A league needs at least "+MINT+" teams.":"");
 }
 function drawAll(){drawNames();drawLegs();drawEditor();renderView()}
 function dirty(){unsaved=true;msg.textContent="Unpublished changes."}
@@ -367,6 +382,25 @@ var s=+e.target.getAttribute("data-s");var r=S.res[k]||["",""];r[s]=e.target.val
 document.getElementById("names").addEventListener("input",function(e){
 var n=e.target.getAttribute("data-n");if(n==null||!admin)return;
 S.names[+n]=e.target.value;dirty();renderView();drawEditor()});
+var delArm=null,delTm;
+function resetDel(){Array.prototype.forEach.call(document.querySelectorAll("#names [data-del]"),function(b){b.textContent="Delete";b.classList.remove("arm")});delArm=null;clearTimeout(delTm)}
+document.getElementById("names").addEventListener("click",function(e){
+var b=e.target.closest("[data-del]");if(!b||!admin||b.disabled)return;
+var id=+b.getAttribute("data-del");
+if(delArm!==id){resetDel();delArm=id;b.textContent="Tap to confirm";b.classList.add("arm");delTm=setTimeout(resetDel,3000);return}
+resetDel();removeTeam(id)});
+function removeTeam(id){
+var x=S.ids.indexOf(id);if(x<0||S.ids.length<=MINT)return;
+S.ids.splice(x,1);S.names.splice(x,1);
+[S.res,S.times].forEach(function(o){Object.keys(o).forEach(function(k){var p=k.split("-");if(+p[0]===id||+p[1]===id)delete o[k]})});
+dirty();drawAll()}
+function addTeam(){
+if(!admin||S.ids.length>=MAXT)return;
+var inp=document.getElementById("newt"),n=inp.value.trim()||("Team "+(S.ids.length+1));
+S.ids.push(S.nid);S.nid++;S.names.push(n.slice(0,24));
+inp.value="";dirty();drawAll()}
+document.getElementById("addt").onclick=addTeam;
+document.getElementById("newt").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();addTeam()}});
 document.getElementById("l1").onclick=function(){S.legs=1;dirty();drawLegs();drawEditor();renderView()};
 document.getElementById("l2").onclick=function(){S.legs=2;dirty();drawLegs();drawEditor();renderView()};
 
