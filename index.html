@@ -185,7 +185,6 @@ body.admin .foot .li{display:none}
 <div class="err" id="err"></div>
 </div>
 
-<div class="foot"><button class="li" id="lo">Admin sign in</button></div>
 </main>
 
 <script type="module">
@@ -429,13 +428,19 @@ onSnapshot(ref, function(snap){
 
 /* Admin sign in */
 var login = document.getElementById("login"), err = document.getElementById("err");
-document.getElementById("lo").onclick = function(){login.hidden = false; document.getElementById("em").focus()};
-document.getElementById("sc").onclick = function(){login.hidden = true; err.textContent = ""};
+/* Login is hidden: open the site with #admin-login on the end of the address to show it */
+var ADMIN_HASH = "admin-login";
+function checkAdminHash(){
+  if(location.hash.replace("#","")===ADMIN_HASH && !admin){login.hidden = false; document.getElementById("em").focus()}
+}
+window.addEventListener("hashchange", checkAdminHash);
+function closeLogin(){login.hidden = true; err.textContent = ""; if(location.hash.replace("#","")===ADMIN_HASH) history.replaceState(null,"",location.pathname+location.search)}
+document.getElementById("sc").onclick = closeLogin;
 document.getElementById("si").onclick = async function(){
   err.textContent = "";
   try{
     await signInWithEmailAndPassword(auth, document.getElementById("em").value.trim(), document.getElementById("pw").value);
-    document.getElementById("pw").value = ""; login.hidden = true;
+    document.getElementById("pw").value = ""; closeLogin();
   }catch(e){ err.textContent = "Wrong email or password." }
 };
 document.getElementById("out").onclick = function(){signOut(auth)};
@@ -448,6 +453,7 @@ onAuthStateChanged(auth, function(user){
 });
 
 route();
+checkAdminHash();
 drawAll();
 </script>
 </body>
