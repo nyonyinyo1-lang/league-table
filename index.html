@@ -66,6 +66,66 @@ body.admin div.row.adminonly{display:flex}
 .foot{text-align:center;margin-top:8px}
 .foot button{background:none;border:0;color:var(--mut);font-size:12px;text-decoration:underline}
 body.admin .foot .li{display:none}
+/* ===== Public view (Google-style) ===== */
+.pv{color:#202124}
+.pv a{-webkit-tap-highlight-color:transparent}
+.pv .ttl{font-size:26px;font-weight:500;margin:6px 2px 2px;letter-spacing:-.01em}
+.pv .sub{font-size:12px;color:#5f6368;margin:0 2px 14px}
+.pv .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none}
+.pv .tabs::-webkit-scrollbar{display:none}
+.pv .tab,.pv .pill{flex:none;display:inline-block;font:inherit;font-size:14px;color:#202124;background:#f1f3f4;border:1.5px solid transparent;border-radius:999px;padding:9px 16px;text-decoration:none;cursor:pointer}
+.pv .tab.on,.pv .pill.on{background:#e8eaed;border-color:#3c4043;color:#202124;font-weight:600}
+.pv .filters{display:flex;gap:8px;margin:0 0 6px}
+.pv .filters .pill{padding:7px 14px;font-size:13px}
+.pv .sec{font-size:20px;font-weight:500;margin:4px 2px 10px;text-transform:none;letter-spacing:0;color:#202124}
+.pv .lab{font-size:12px;color:#5f6368;margin:14px 4px 8px;font-weight:500}
+.pv .mh{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin:16px 4px 8px;color:#5f6368}
+.pv .mh b{color:#202124;font-weight:600}
+.pv .mc{display:flex;align-items:stretch;background:#f1f3f4;border-radius:16px;padding:12px 14px 12px 16px;margin-bottom:10px}
+.pv .mt{flex:1;min-width:0}
+.pv .mr{display:grid;grid-template-columns:26px 1fr auto 10px;gap:10px;align-items:center;padding:5px 0;font-size:15px}
+.pv .mr.lo .tl,.pv .mr.lo .ms{color:#5f6368}
+.pv .mr.me .tl{font-weight:700}
+.pv .ms{font-weight:500;min-width:14px;text-align:right}
+.pv .wm{width:0;height:0;border:4px solid transparent;border-left:0;border-right-color:#202124}
+.pv .wm.n{border-right-color:transparent}
+.pv .tl{color:inherit;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pv .rt{width:92px;flex:none;border-left:1px solid #dadce0;margin-left:10px;padding-left:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:12px;color:#5f6368;gap:4px}
+.pv .rt small{font-size:12px;color:#202124}
+.pv .cr{width:26px;height:26px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.02em;flex:none}
+.pv .cr.big{width:60px;height:60px;font-size:20px}
+.pv .more{display:flex;align-items:center;justify-content:center;gap:6px;background:#e8f0fe;color:#1a3d7c;border-radius:999px;padding:14px;font-size:15px;font-weight:500;text-decoration:none;margin:4px 0 18px}
+.pv .em{background:#f1f3f4;border-radius:16px;padding:18px;text-align:center;color:#5f6368;font-size:14px;margin-bottom:10px}
+.pv .tc{border-top:1px solid #dadce0;padding-top:14px}
+.pv .tch{display:flex;justify-content:space-between;align-items:center;color:#202124;text-decoration:none;margin-bottom:4px}
+.pv .tch span:last-child{color:#5f6368;font-size:20px}
+.pv .scroll{margin:0 -12px;padding:0 12px}
+.pv table{min-width:0;width:100%}
+.pv th{background:transparent;color:#5f6368;font-size:12px;font-weight:500;border-bottom:1px solid #dadce0;padding:8px 6px}
+.pv th:nth-last-child(2){color:#5f6368}
+.pv td{padding:10px 6px;border-bottom:1px solid #eceff1}
+.pv tr:first-child td{background:transparent}
+.pv tbody tr:last-child td{border-bottom:0}
+.pv td.t{max-width:none;overflow:visible}
+.pv .pos{width:34px;min-width:34px}
+.pv .tn{display:inline-flex;align-items:center;gap:8px;font-weight:500;max-width:100%}
+.pv .tn span{overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.pv .tn .cr{width:22px;height:22px;font-size:9px}
+.pv .ft{min-width:470px}
+.pv .ft td:first-child,.pv .ft th:first-child{position:sticky;left:0;background:#fff;z-index:1}
+.pv .ft td.t,.pv .ft th.t{position:sticky;left:34px;background:#fff;z-index:1;box-shadow:6px 0 6px -6px rgba(0,0,0,.15)}
+.pv .bk{display:inline-flex;align-items:center;gap:6px;color:#1a3d7c;text-decoration:none;font-size:14px;font-weight:500;margin:0 0 12px 2px}
+.pv .tm1{display:flex;align-items:center;gap:14px;margin:2px 2px 16px}
+.pv .tm1 b{display:block;font-size:24px;font-weight:500;line-height:1.2}
+.pv .tm1 span.s{font-size:13px;color:#5f6368}
+.pv .st{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.pv .st div{background:#f1f3f4;border-radius:12px;padding:10px 4px;text-align:center}
+.pv .st b{display:block;font-size:18px;font-weight:600}
+.pv .st span{font-size:11px;color:#5f6368}
+.pv .fb{background:#f1f3f4;border-radius:16px;padding:14px 16px;margin-bottom:6px}
+.pv .fb .fm b{width:32px;height:32px;line-height:32px;font-size:13px;margin:0 6px 0 0}
+.pv .fm b{text-align:center}
+.pv .fb .nt{font-size:12px;color:#5f6368;margin-top:10px}
 </style>
 </head>
 <body>
@@ -73,9 +133,13 @@ body.admin .foot .li{display:none}
 <div class="adm" id="adm" hidden>
   <span class="tx"><b>Admin mode.</b> Viewers see changes after you publish. <span id="msg"></span></span>
   <button class="go" id="pub">Publish results</button>
+  <button id="prev">View as public</button>
   <button id="out">Sign out</button>
 </div>
 
+<div id="pv" class="pv"></div>
+
+<div id="av" hidden>
 <h1>League Table</h1>
 
 <div class="card">
@@ -100,6 +164,8 @@ body.admin .foot .li{display:none}
 <h2>Teams</h2>
 <div class="names" id="names"></div>
 <div class="row" style="margin-top:12px"><button id="rst">Clear all results</button></div>
+</div>
+
 </div>
 
 <div class="card login" id="login" hidden>
@@ -177,7 +243,7 @@ function drawLegs(){document.getElementById("l1").className=S.legs===1?"on":"";d
 function drawNames(){
 document.getElementById("names").innerHTML=S.names.map(function(n,i){return "<input data-n='"+i+"' maxlength='24' value=\""+esc(n)+"\" aria-label='Team "+(i+1)+" name'>"}).join("");
 }
-function drawAll(){drawNames();drawLegs();drawFx();drawTable()}
+function drawAll(){applyMode();drawNames();drawLegs();drawFx();drawTable();drawPublic()}
 function dirty(){unsaved=true;msg.textContent="Unpublished changes."}
 
 document.getElementById("fx").addEventListener("input",function(e){
@@ -231,9 +297,98 @@ onAuthStateChanged(auth, function(user){
   admin = !!user;
   document.body.classList.toggle("admin", admin);
   document.getElementById("adm").hidden = !admin;
-  if(!admin){unsaved = false; msg.textContent = ""}
+  if(!admin){unsaved = false; msg.textContent = ""; preview = false}
   drawAll();
 });
+
+/* ====== Public view: Overview / Matches / Table / Team pages ====== */
+var pv=document.getElementById("pv"),av=document.getElementById("av"),prevBtn=document.getElementById("prev"),preview=false,mf="all";
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DAY=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var PAL=["#c8102e","#1d4ed8","#0f766e","#b45309","#7c3aed","#be185d","#15803d"];
+function sd(v){if(!v)return "Date TBC";var d=new Date(v+"T00:00:00");if(isNaN(d))return v;return DAY[d.getDay()]+", "+d.getDate()+" "+MON[d.getMonth()]}
+function ini(n){var w=n.trim().split(/\s+/);return (w.length>1?w[0].charAt(0)+w[1].charAt(0):n.slice(0,2)).toUpperCase()}
+function crest(i,big){return "<span class='cr"+(big?" big":"")+"' style='background:"+PAL[i%PAL.length]+"'>"+esc(ini(nm(i)))+"</span>"}
+function ord(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+function allM(){var out=[];rounds().forEach(function(ms,ri){ms.forEach(function(m){var p=played(m.k),r=S.res[m.k]||["",""];out.push({k:m.k,h:m.h,a:m.a,ri:ri,date:S.dates[ri]||"",time:S.times[m.k]||"",pl:p,hg:p?+r[0]:null,ag:p?+r[1]:null})})});return out}
+function chips(arr){return arr.map(function(c){return "<b class='"+c+"'>"+c+"</b>"}).join("")}
+function resFor(m,f){var gf=m.h===f?m.hg:m.ag,ga=m.h===f?m.ag:m.hg;return gf>ga?"W":gf<ga?"L":"D"}
+function card(m,f){
+  function row(i,sc,win,lose){return "<div class='mr"+(lose?" lo":"")+(f===i?" me":"")+"'>"+crest(i)+"<a class='tl' href='#team-"+i+"'>"+esc(nm(i))+"</a><span class='ms'>"+(m.pl?sc:"")+"</span><span class='wm"+(win?"":" n")+"'></span></div>"}
+  var hw=m.pl&&m.hg>m.ag,aw=m.pl&&m.ag>m.hg;
+  var right=m.pl
+    ?"<small>FT</small><span>"+esc(sd(m.date))+"</span>"+(f!=null?"<span class='fm'>"+chips([resFor(m,f)])+"</span>":"")
+    :"<small>"+(m.time?esc(m.time):"vs")+"</small><span>"+esc(sd(m.date))+"</span>";
+  return "<div class='mc'><div class='mt'>"+row(m.h,m.hg,hw,aw)+row(m.a,m.ag,aw,hw)+"</div><div class='rt'>"+right+"</div></div>";
+}
+function cards(list,f){return list.map(function(m){return card(m,f)}).join("")}
+function empty(t){return "<div class='em'>"+t+"</div>"}
+function mdInfo(){var last=-1;allM().forEach(function(m){if(m.pl&&m.ri>last)last=m.ri});return {cur:last+1,tot:rounds().length}}
+function zone(n){return n<2?"z1":n===2?"z2":n>=5?"z3":""}
+function legend(){return "<div class='lg'><span><i style='background:#04f5ff'></i>Champions League</span><span><i style='background:#ff8a00'></i>Europa League</span><span><i style='background:#e90052'></i>Relegation</span></div>"}
+function teamA(i){return "<a class='tl tn' href='#team-"+i+"'>"+crest(i)+"<span>"+esc(nm(i))+"</span></a>"}
+
+function vOverview(){
+  var all=allM(),done=all.filter(function(m){return m.pl}).reverse().slice(0,3),next=all.filter(function(m){return !m.pl}).slice(0,3);
+  var out="<h2 class='sec'>Matches</h2>";
+  if(done.length)out+="<div class='lab'>Latest results</div>"+cards(done);
+  if(next.length)out+="<div class='lab'>Coming up</div>"+cards(next);
+  if(!done.length&&!next.length)out+=empty("No matches yet.");
+  out+="<a class='more' href='#matches'>More matches <span>&#8250;</span></a>";
+  var rows=table().map(function(x,n){return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td></tr>"}).join("");
+  out+="<div class='tc'><a class='tch' href='#table'><h2 class='sec' style='margin:0'>Table</h2><span>&#8250;</span></a>"
+    +"<table><thead><tr><th>#</th><th class='t'>Team</th><th>P</th><th>GD</th><th>Pts</th></tr></thead><tbody>"+rows+"</tbody></table>"+legend()+"</div>";
+  return out;
+}
+function vMatches(){
+  var all=allM(),order=[],out="";
+  rounds().forEach(function(_,ri){order.push(ri)});
+  if(mf==="res")order.reverse();
+  order.forEach(function(ri){
+    var ms=all.filter(function(m){return m.ri===ri&&(mf==="all"||(mf==="res"?m.pl:!m.pl))});
+    if(!ms.length)return;
+    out+="<div class='mh'><b>Matchday "+(ri+1)+"</b><span>"+esc(sd(S.dates[ri]||""))+"</span></div>"+cards(ms);
+  });
+  var f=[["all","All"],["res","Results"],["up","Upcoming"]].map(function(x){return "<button class='pill"+(mf===x[0]?" on":"")+"' data-mf='"+x[0]+"'>"+x[1]+"</button>"}).join("");
+  return "<div class='filters'>"+f+"</div>"+(out||empty(mf==="res"?"No results yet.":mf==="up"?"No upcoming matches.":"No matches yet."));
+}
+function vTable(){
+  var rows=table().map(function(x,n){
+    return "<tr class='"+zone(n)+"'><td class='pos'>"+(n+1)+"</td><td class='t'>"+teamA(x.i)+"</td><td>"+x.p+"</td><td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td><td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td><td class='fm'>"+chips(x.f.slice(-5))+"</td></tr>"}).join("");
+  return "<div class='scroll'><table class='ft'><thead><tr><th>#</th><th class='t'>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead><tbody>"+rows+"</tbody></table></div>"+legend()+"<div class='note'>Tap a team to see its results, fixtures and form.</div>";
+}
+function vTeam(i){
+  var tb=table(),pos=0,row=null;
+  tb.forEach(function(x,n){if(x.i===i){pos=n+1;row=x}});
+  var mine=allM().filter(function(m){return m.h===i||m.a===i});
+  var past=mine.filter(function(m){return m.pl}).reverse(),next=mine.filter(function(m){return !m.pl});
+  var fm=row.f.slice(-5),fp=0;fm.forEach(function(c){fp+=c==="W"?3:c==="D"?1:0});
+  var stats=[["P",row.p],["W",row.w],["D",row.d],["L",row.l],["GF",row.gf],["GA",row.ga],["GD",(row.gd>0?"+":"")+row.gd],["Pts",row.pts]].map(function(s){return "<div><b>"+s[1]+"</b><span>"+s[0]+"</span></div>"}).join("");
+  return "<a class='bk' href='#table'>&#8249; Table</a>"
+    +"<div class='tm1'>"+crest(i,true)+"<div><b>"+esc(nm(i))+"</b><span class='s'>"+ord(pos)+" in the table &middot; "+row.pts+" pts</span></div></div>"
+    +"<div class='st'>"+stats+"</div>"
+    +"<h2 class='sec'>Form</h2><div class='fb'>"+(fm.length?"<div class='fm'>"+chips(fm)+"</div><div class='nt'>"+fp+" of "+fm.length*3+" points from the last "+fm.length+" &middot; oldest to latest</div>":"No matches played yet.")+"</div>"
+    +"<h2 class='sec' style='margin-top:18px'>Past results</h2>"+(past.length?cards(past,i):empty("No results yet."))
+    +"<h2 class='sec' style='margin-top:18px'>Upcoming games</h2>"+(next.length?cards(next,i):empty("No upcoming games."));
+}
+function drawPublic(){
+  var h=(location.hash||"#overview").slice(1),t=/^team-([0-6])$/.exec(h),tab=h,body;
+  if(t){body=vTeam(+t[1]);tab="table"}
+  else if(h==="matches")body=vMatches();
+  else if(h==="table")body=vTable();
+  else{tab="overview";body=vOverview()}
+  var info=mdInfo();
+  var tabs="<nav class='tabs'>"+[["overview","Overview"],["matches","Matches"],["table","Table"]].map(function(x){return "<a class='tab"+(tab===x[0]?" on":"")+"' href='#"+x[0]+"'>"+x[1]+"</a>"}).join("")+"</nav>";
+  pv.innerHTML="<div class='ttl'>League Table</div><div class='sub'>"+(info.cur?"Matchday "+info.cur+" of "+info.tot:"Not started &middot; "+info.tot+" matchdays")+"</div>"+tabs+body;
+}
+function applyMode(){
+  var showPub=!admin||preview;
+  pv.hidden=!showPub;av.hidden=showPub;
+  prevBtn.textContent=preview?"Back to editing":"View as public";
+}
+pv.addEventListener("click",function(e){var b=e.target.closest("[data-mf]");if(b){mf=b.getAttribute("data-mf");drawPublic()}});
+window.addEventListener("hashchange",function(){drawPublic();window.scrollTo(0,0)});
+prevBtn.onclick=function(){preview=!preview;applyMode();drawPublic();window.scrollTo(0,0)};
+
 
 drawAll();
 </script>
