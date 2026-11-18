@@ -67,14 +67,11 @@ table.lt{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
 .lt .tcol{position:sticky;left:36px;z-index:1;text-align:left;padding-left:4px}
 .lt td.tcol a{display:flex;align-items:center;gap:10px;color:var(--tx);text-decoration:none;font-weight:500}
 .lt td.tcol span{max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.lt th.pt{font-weight:700;color:var(--tx)}
 .lt td.p{font-weight:700}
-.lt tr.z1 .pos{border-left-color:#1a73e8}
-.lt tr.z2 .pos{border-left-color:#e8710a}
-.lt tr.z3 .pos{border-left-color:#d93025}
+.ptb{display:inline-block;min-width:26px;height:26px;line-height:26px;padding:0 6px;box-sizing:border-box;border-radius:13px;background:#000;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
 .fm{white-space:nowrap}
 .fm b{display:inline-block;width:20px;height:20px;line-height:20px;border-radius:50%;font-size:11px;font-weight:600;color:#fff;margin:0 2px;text-align:center}
-.lg{display:flex;gap:6px 14px;flex-wrap:wrap;margin:10px 2px 6px;font-size:12px;color:var(--mut)}
-.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 
 /* matches tab */
 .flt{display:flex;gap:8px;margin:2px 0 6px}
@@ -263,7 +260,6 @@ function curMd(){var rs=rounds(),i,j;for(i=0;i<rs.length;i++)for(j=0;j<rs[i].len
 function fmtDate(v){if(!v)return "Date to be confirmed";try{return new Date(v+"T00:00:00").toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"})}catch(e){return v}}
 function fmtShort(v){if(!v)return "";try{return new Date(v+"T00:00:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return v}}
 function formHTML(a){return a.map(function(c){return "<b class='"+c+"'>"+c+"</b>"}).join("")}
-function legend(){if(S.ids.length<6)return "";return "<div class='lg'><span><i style='background:#1a73e8'></i>Champions League</span><span><i style='background:#e8710a'></i>Europa League</span><span><i style='background:#d93025'></i>Relegation</span></div>"}
 
 function card(m,f){
   var pl=played(m.k),r=S.res[m.k]||["",""],h=+r[0],a=+r[1],tv=S.times[m.k]||"",dv=fmtShort(S.dates[m.ri]||"");
@@ -293,11 +289,12 @@ function pairBlock(list,f){
     return "<div class='pg'>"+ms.map(function(m){return card(m,f)}).join("")+aggHTML(pk)+"</div>"}).join("");
 }
 
+function PT(v){return "<td class='p'><span class='ptb'>"+v+"</span></td>"}
 function tblHTML(full){
-  var T=table(),h="<div class='tw'><table class='lt'><thead><tr><th class='pos'>#</th><th class='tcol'>Team</th><th>P</th>"+(full?"<th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th>":"")+"<th>GD</th><th>Pts</th>"+(full?"<th>Form</th>":"")+"</tr></thead><tbody>";
+  var T=table(),h="<div class='tw'><table class='lt'><thead><tr><th class='pos'>#</th><th class='tcol'>Team</th><th>P</th>"+(full?"<th>W</th><th>D</th><th>L</th><th class='pt'>Pts</th><th>GF</th><th>GA</th>":"")+"<th>GD</th>"+(full?"":"<th class='pt'>Pts</th>")+(full?"<th>Form</th>":"")+"</tr></thead><tbody>";
   T.forEach(function(x,n){
-    var NT=T.length,z=NT<6?"":n<2?"z1":n===2?"z2":n>=NT-2?"z3":"";
-    h+="<tr class='"+z+"' data-team='"+x.i+"'><td class='pos'>"+(n+1)+"</td><td class='tcol'><a href='#team-"+x.i+"'>"+badge(x.i)+"<span>"+esc(nm(x.i))+"</span></a></td><td>"+x.p+"</td>"+(full?"<td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td><td>"+x.gf+"</td><td>"+x.ga+"</td>":"")+"<td>"+(x.gd>0?"+":"")+x.gd+"</td><td class='p'>"+x.pts+"</td>"+(full?"<td class='fm'>"+formHTML(x.f.slice(-5))+"</td>":"")+"</tr>";
+    var z="";
+    h+="<tr class='"+z+"' data-team='"+x.i+"'><td class='pos'>"+(n+1)+"</td><td class='tcol'><a href='#team-"+x.i+"'>"+badge(x.i)+"<span>"+esc(nm(x.i))+"</span></a></td><td>"+x.p+"</td>"+(full?"<td>"+x.w+"</td><td>"+x.d+"</td><td>"+x.l+"</td>"+PT(x.pts)+"<td>"+x.gf+"</td><td>"+x.ga+"</td>":"")+"<td>"+(x.gd>0?"+":"")+x.gd+"</td>"+(full?"":PT(x.pts))+(full?"<td class='fm'>"+formHTML(x.f.slice(-5))+"</td>":"")+"</tr>";
   });
   return h+"</tbody></table></div>";
 }
@@ -309,7 +306,7 @@ function vOverview(){
   var list=P.slice(0,nr).concat(U.slice(0,nn));
   return "<h2 class='sec' style='margin-top:4px'>Matches</h2>"+pairBlock(list)+
     "<a class='more' href='#matches'>More matches "+CHEV+"</a>"+
-    "<h2 class='sec'>Table</h2><div class='box'>"+tblHTML(false)+"</div>"+legend()+
+    "<h2 class='sec'>Table</h2><div class='box'>"+tblHTML(false)+"</div>"+
     "<a class='more' href='#table'>Full table "+CHEV+"</a>";
 }
 
@@ -329,7 +326,7 @@ function vMatches(){
   return h+out;
 }
 
-function vTable(){return "<div class='box'>"+tblHTML(true)+"</div>"+legend()+"<div class='note' style='margin:6px 2px 0'>Sorted by points, then goal difference, then goals scored. Tap a team to see its matches and form.</div>"}
+function vTable(){return "<div class='box'>"+tblHTML(true)+"</div>"+"<div class='note' style='margin:6px 2px 0'>Sorted by points, then goal difference, then goals scored. Tap a team to see its matches and form.</div>"}
 
 function vTeam(i){
   var T=table(),pos=0,x=null;T.forEach(function(r,n){if(r.i===i){pos=n+1;x=r}});
