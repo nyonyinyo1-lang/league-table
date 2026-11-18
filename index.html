@@ -222,7 +222,7 @@ body.admin .foot .li{display:none}
 <div class="names" id="names"></div>
 <div class="row" style="margin-top:12px"><input id="newt" maxlength="24" placeholder="New team name" aria-label="New team name" style="flex:1;min-width:140px"><button class="on" id="addt">Add team</button></div>
 <div class="note" id="tnote"></div>
-<div class="row" style="margin-top:12px"><button id="rst">Clear all results</button></div>
+<div class="row" style="margin-top:12px"><button id="rst">Reset scores, dates and times</button></div>
 </div>
 
 <div class="card login" id="login" hidden>
@@ -645,8 +645,8 @@ document.getElementById("l2").onclick=function(){S.legs=2;dirty();drawLegs();dra
 
 var rb=document.getElementById("rst"),armed=false,tm;
 rb.onclick=function(){
-if(!armed){armed=true;rb.textContent="Tap again to confirm";tm=setTimeout(function(){armed=false;rb.textContent="Clear all results"},3000);return}
-clearTimeout(tm);armed=false;rb.textContent="Clear all results";S.res={};dirty();drawEditor();renderView()};
+if(!armed){armed=true;rb.textContent="Tap again to confirm";tm=setTimeout(function(){armed=false;rb.textContent="Reset scores, dates and times"},3000);return}
+clearTimeout(tm);armed=false;rb.textContent="Reset scores, dates and times";S.res={};S.dates={};S.times={};dirty();drawEditor();renderView()};
 
 /* Publish: save to Firestore. Viewers update live. */
 pub.onclick = async function(){
