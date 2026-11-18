@@ -236,7 +236,8 @@ function ord(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]
 function rounds(){var arr=S.ids.slice(),base=[],r,i,l,out=[];
 if(arr.length%2)arr.push(-1);var m=arr.length;
 for(r=0;r<m-1;r++){var ms=[];for(i=0;i<m/2;i++){var x=arr[i],y=arr[m-1-i];if(x!==-1&&y!==-1)ms.push([x,y])}base.push(ms);arr=[arr[0],arr[m-1]].concat(arr.slice(1,m-1))}
-for(l=1;l<=S.legs;l++)base.forEach(function(ms){out.push(ms.map(function(p){var lo=Math.min(p[0],p[1]),hi=Math.max(p[0],p[1]);return l===1?{k:lo+"-"+hi+"-1",h:lo,a:hi}:{k:lo+"-"+hi+"-2",h:hi,a:lo}}))});
+/* home and away: both legs of a pairing share one matchday (same date) */
+base.forEach(function(ms){var rd=[];for(l=1;l<=S.legs;l++)ms.forEach(function(p){var lo=Math.min(p[0],p[1]),hi=Math.max(p[0],p[1]);rd.push(l===1?{k:lo+"-"+hi+"-1",h:lo,a:hi}:{k:lo+"-"+hi+"-2",h:hi,a:lo})});out.push(rd)});
 return out}
 function fixtures(){return [].concat.apply([],rounds())}
 function fxList(){var out=[];rounds().forEach(function(ms,ri){ms.forEach(function(m){out.push({k:m.k,h:m.h,a:m.a,ri:ri})})});return out}
