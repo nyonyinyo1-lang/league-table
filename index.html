@@ -438,6 +438,8 @@ function renderView(){
 }
 
 /* ---------- free-to-play predictions (virtual points, no cash) ---------- */
+function r2(n){return Math.round(n*100)/100}
+function KSH(n){return "KSh "+r2(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}
 var PKEY="dls_predict_v1",START=1000,MARGIN=1.06,HA=1.0,NG=12;
 var P={id:"",name:"",bets:[]},slip=[],px={tab:"mk",open:{},mode:"single",stake:"50",msg:"",sheet:false,lb:null,lbErr:false};
 var _st=null,_fx=null,_gc={},lastSync=null,syncTm=null;
@@ -523,8 +525,8 @@ function betState(b){var rs=b.sels.map(selRes),i,pr=1,won=0;
 if(rs.indexOf("L")>=0)return {st:"lost",ret:0,rs:rs};
 if(rs.indexOf(null)>=0)return {st:"open",ret:0,rs:rs};
 for(i=0;i<rs.length;i++)if(rs[i]==="W"){pr*=b.sels[i].odds;won++}
-return won?{st:"won",ret:Math.round(b.stake*pr),rs:rs}:{st:"void",ret:b.stake,rs:rs}}
-function pBal(){var st=0,ret=0,op=0;P.bets.forEach(function(b){var s=betState(b);st+=b.stake;if(s.st==="open")op+=b.stake;else ret+=s.ret});var free=START-st+ret;return {free:free,open:op,pts:free+op}}
+return won?{st:"won",ret:r2(b.stake*pr),rs:rs}:{st:"void",ret:b.stake,rs:rs}}
+function pBal(){var st=0,ret=0,op=0;P.bets.forEach(function(b){var s=betState(b);st+=b.stake;if(s.st==="open")op+=b.stake;else ret+=s.ret});var free=START-st+ret;return {free:r2(free),open:r2(op),pts:r2(free+op)}}
 
 /* bet slip */
 function pkOf(K){return K.charAt(0)==="P"?K.slice(2):K.replace(/-\d$/,"")}
@@ -535,9 +537,9 @@ slip=slip.filter(function(s){return !clash(s,n)});slip.push(n);}
 function sumNums(){var n=slip.length,st=Math.floor(+px.stake)||0,acca=px.mode==="acca"&&n>1,ret=0,pr=1,tot;
 slip.forEach(function(s){var f=info(s.K,s.mid,s.oid);if(!f||!f.odds)return;pr*=f.odds;ret+=st*f.odds});
 if(acca){ret=st*pr;tot=st}else tot=st*n;
-return {tot:tot,ret:Math.round(ret),pr:(acca||n===1)?pr:null}}
-function sumHTML(){var x=sumNums();return "Total stake <b>"+x.tot+"</b> pts &middot; Payout <b>"+x.ret+"</b> pts"}
-function stripHTML(){var x=sumNums();return "<span>"+(x.pr!==null?"Odds "+x.pr.toFixed(2):slip.length+" bets")+"</span><span>Payout "+x.ret+" pts</span>"}
+return {tot:tot,ret:r2(ret),pr:(acca||n===1)?pr:null}}
+function sumHTML(){var x=sumNums();return "Total stake <b>"+KSH(x.tot)+"</b> &middot; Payout <b>"+KSH(x.ret)+"</b>"}
+function stripHTML(){var x=sumNums();return "<span>"+(x.pr!==null?"Odds "+x.pr.toFixed(2):slip.length+" bets")+"</span><span>Payout "+KSH(x.ret)+"</span>"}
 var IC={mk:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 11l9-8 9 8v10H3z'/></svg>",
 bets:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='3' width='16' height='18' rx='3'/><path d='M8 9h8M8 13h8M8 17h5'/></svg>",
 lb:"<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h16M6 20v-8h4v8M10 20V6h4v14M14 20v-5h4v5'/></svg>",
@@ -558,10 +560,10 @@ el.innerHTML=h}
 function place(){var n=slip.length,st=Math.floor(+px.stake),acca=px.mode==="acca"&&n>1,inf,tot,bets=[];
 if(!n){px.msg="Add a pick first.";return}
 if(!P.name){px.msg="Enter a nickname at the top of the page first.";return}
-if(!(st>=1)){px.msg="Enter a stake of at least 1 point.";return}
+if(!(st>=1)){px.msg="Enter a stake of at least KSh 1.";return}
 inf=slip.map(function(s){return info(s.K,s.mid,s.oid)});
 if(inf.some(function(f){return !f||!f.open||!f.odds})){px.msg="Some picks are closed or unavailable. Remove them first.";return}
-tot=acca?st:st*n;if(tot>pBal().free){px.msg="Not enough points.";return}
+tot=acca?st:st*n;if(tot>pBal().free){px.msg="Not enough balance.";return}
 function mk(i){return {K:slip[i].K,mid:slip[i].mid,oid:slip[i].oid,odds:inf[i].odds,pn:inf[i].pn,mkn:inf[i].mkn,mt:inf[i].mt}}
 var t=Date.now(),i;
 if(acca)bets.push({id:t+"a",t:t,stake:st,sels:slip.map(function(_,i){return mk(i)})});
@@ -600,14 +602,14 @@ out+=g[pk].slice().sort(function(a,b){return a.lg-b.lg}).map(pmCard).join("")+pa
 return out}
 var ST={open:"Open",won:"Won",lost:"Lost",void:"Void"};
 function fmtDT(t){var d=new Date(t),p=function(n){return n<10?"0"+n:""+n};return p(d.getDate())+"/"+p(d.getMonth()+1)+", "+p(d.getHours())+":"+p(d.getMinutes())}
-function betNums(b){var s=betState(b),pr=1;b.sels.forEach(function(x){pr*=x.odds});return {s:s,pr:pr,win:Math.round(b.stake*pr)}}
-function winLine(b,n){return n.s.st==="won"?"Won <b>"+n.s.ret+" pts</b>":n.s.st==="void"?"Returned <b>"+n.s.ret+" pts</b>":"Possible win <b>"+n.win+" pts</b>"}
+function betNums(b){var s=betState(b),pr=1;b.sels.forEach(function(x){pr*=x.odds});return {s:s,pr:pr,win:r2(b.stake*pr)}}
+function winLine(b,n){return n.s.st==="won"?"Won <b>"+KSH(n.s.ret)+"</b>":n.s.st==="void"?"Returned <b>"+KSH(n.s.ret)+"</b>":"Possible win <b>"+KSH(n.win)+"</b>"}
 function pBets(){if(!P.bets.length)return "<p class='empty'>No bets yet. Tap some odds on the Markets tab.</p>";
 return P.bets.slice().reverse().map(function(b){var n=betNums(b);
-return "<button class='bt' data-bet='"+esc(b.code)+"'><span class='r'><span class='c'>#"+esc(b.code)+"</span><span class='a'>"+b.stake+" pts</span></span>"+
+return "<button class='bt' data-bet='"+esc(b.code)+"'><span class='r'><span class='c'>#"+esc(b.code)+"</span><span class='a'>"+KSH(b.stake)+"</span></span>"+
 "<span class='r'><span class='d'>"+fmtDT(b.t)+"</span><span class='sx "+n.s.st+"'>"+ST[n.s.st]+"</span></span>"+
 "<span class='w'>"+winLine(b,n)+"</span></button>"}).join("")+
-"<div class='row' style='margin-top:10px'><button data-preset='1'>Reset my points</button></div>"}
+"<div class='row' style='margin-top:10px'><button data-preset='1'>Reset my balance</button></div>"}
 /* bet details popup */
 function showBet(code){var b=null,i,n,h,m=document.getElementById("bmodal");
 for(i=0;i<P.bets.length;i++)if(P.bets[i].code===code)b=P.bets[i];
@@ -617,20 +619,20 @@ h="<div class='bmc'><div class='bmh'><b>#"+esc(b.code)+"</b><button class='bmx' 
 b.sels.map(function(x,k){var r=n.s.rs[k];return "<div class='bms'><span><small>"+esc(x.mt)+" &middot; "+esc(x.mkn)+"</small><b>"+esc(x.pn)+"</b></span><i>@ "+x.odds.toFixed(2)+"<b>"+(r==="W"?"Won":r==="L"?"Lost":r==="V"?"Void":"Pending")+"</b></i></div>"}).join("")+
 "<div class='bmt'><div><span>Type</span><b>"+(b.sels.length>1?"Accumulator ("+b.sels.length+")":"Single")+"</b></div>"+
 "<div><span>Total odds</span><b>"+n.pr.toFixed(2)+"</b></div>"+
-"<div><span>Stake</span><b>"+b.stake+" pts</b></div>"+
-"<div class='big'><span>"+(n.s.st==="won"?"Won":n.s.st==="void"?"Returned":"Possible win")+"</span><b>"+(n.s.st==="won"||n.s.st==="void"?n.s.ret:n.win)+" pts</b></div></div></div>";
+"<div><span>Stake</span><b>"+KSH(b.stake)+"</b></div>"+
+"<div class='big'><span>"+(n.s.st==="won"?"Won":n.s.st==="void"?"Returned":"Possible win")+"</span><b>"+KSH(n.s.st==="won"||n.s.st==="void"?n.s.ret:n.win)+"</b></div></div></div>";
 m.innerHTML=h;m.hidden=false}
 function closeBet(){var m=document.getElementById("bmodal");m.hidden=true;m.innerHTML=""}
 function pLeaders(){var me=pBal().pts,rows=(px.lb||[]).filter(function(x){return x.id!==P.id});
 if(P.name)rows.push({id:P.id,name:P.name,pts:me});
 rows.sort(function(a,b){return b.pts-a.pts});
-var h=rows.length?rows.map(function(x,i){return "<div class='lbr"+(x.id===P.id?" me":"")+"'><span class='r'>"+(i+1)+"</span><span class='n'>"+esc(x.name)+"</span><b>"+x.pts+"</b></div>"}).join(""):"<p class='empty'>No players yet.</p>";
+var h=rows.length?rows.map(function(x,i){return "<div class='lbr"+(x.id===P.id?" me":"")+"'><span class='r'>"+(i+1)+"</span><span class='n'>"+esc(x.name)+"</span><b>"+KSH(x.pts)+"</b></div>"}).join(""):"<p class='empty'>No players yet.</p>";
 if(px.lbErr||px.lb===null)h+="<div class='note'>The shared leaderboard is not switched on yet, so you only see your own score here.</div>";
-return h+"<div class='note'>Ranked by points (free points plus open stakes). Everyone starts with "+START+".</div>"}
+return h+"<div class='note'>Ranked by total money (balance plus open stakes). Everyone starts with "+KSH(START)+".</div>"}
 function vPredict(){var b=pBal();
-var h="<div class='ptop'><b>Predict</b><span class='ppts'>"+b.free+" pts</span></div>";
-h+="<div class='pnote'>Free to play. Points have no cash value and nothing can be bought or withdrawn. Odds come from the table and move as results come in.</div>";
-h+="<div class='pmeta'><span>In play: "+b.open+" pts</span><span>"+(P.name?esc(P.name)+" &middot; <button data-pchg='1'>Change</button>":"No nickname yet")+"</span></div>";
+var h="<div class='ptop'><b>Predict</b><span class='ppts'>"+KSH(b.free)+"</span></div>";
+h+="<div class='pnote'>Free to play. This is virtual money with no cash value, and nothing can be bought or withdrawn. Odds come from the table and move as results come in.</div>";
+h+="<div class='pmeta'><span>In play: "+KSH(b.open)+"</span><span>"+(P.name?esc(P.name)+" &middot; <button data-pchg='1'>Change</button>":"No nickname yet")+"</span></div>";
 if(!P.name)h+="<div class='card' style='margin:0 0 12px'><h2>Pick a nickname</h2><div class='row'><input id='pname' maxlength='16' placeholder='Your nickname' style='flex:1;min-width:140px'><button class='on' data-pname='1'>Save</button></div></div>";
 if(px.tab==="mk")h+="<div class='bhd'><span>Teams</span><div class='c'><span>1</span><span>X</span><span>2</span></div></div>"+pMarkets();
 else if(px.tab==="bets")h+="<h2 class='sec' style='margin-top:4px'>My bets</h2>"+pBets();
@@ -733,7 +735,7 @@ if((t=e.target.closest("[data-pmx]"))){a=t.getAttribute("data-pmx");px.open[a]=!
 if((t=e.target.closest("[data-ptab]"))){px.tab=t.getAttribute("data-ptab");renderView();return}
 if(e.target.closest("[data-pname]")){var nv=document.getElementById("pname").value.trim().slice(0,16);if(nv){P.name=nv;pSave();lastSync=null;renderView()}return}
 if(e.target.closest("[data-pchg]")){P.name="";pSave();renderView();return}
-if(e.target.closest("[data-preset]")){if(confirm("Reset your points and bets back to "+START+"?")){P.bets=[];slip=[];pSave();lastSync=null;renderView()}return}
+if(e.target.closest("[data-preset]")){if(confirm("Reset your balance and bets back to "+KSH(START)+"?")){P.bets=[];slip=[];pSave();lastSync=null;renderView()}return}
 });
 document.getElementById("bmodal").addEventListener("click",function(e){if(e.target.id==="bmodal"||e.target.closest("[data-bclose]"))closeBet()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeBet()});
